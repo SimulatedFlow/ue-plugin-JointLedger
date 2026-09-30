@@ -1,0 +1,28 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "JointLedger - The Joint That Held Nothing",
+	"Description": "A physics constraint whose two frames resolve to nothing is not an error in Unreal: InitConstraint is only called when at least one body was found (PhysicsConstraintComponent.cpp:344), and the broken flag is set to false regardless - so IsBroken() reports false and nothing appears in the log. The joint simply never came into existence, and from the outside it looks exactly like a healthy one. JointLedger walks every physics constraint in the running world and records, for each one, which bodies it actually resolved to and whether the constraint instance was ever created. It reports both frames empty as an error, but NOT a single empty frame: the engine's own comment calls that 'joint to world' (PhysicsConstraintComponent.cpp:110), and a tool that flags it would blame a legitimate world anchor. A constraint whose bodies exist but where neither of them simulates is reported separately, because the fix is in a different place. It runs where the editor cannot: in a packaged build and on a build server, with 0 clean / 1 warnings / 2 errors.",
+	"Category": "Code Plugins",
+	"CreatedBy": "Silvan Teufel",
+	"CreatedByURL": "https://silvan.teufel-engineering.com",
+	"DocsURL": "https://wiki.teufel-engineering.com/en/JointLedger/documentation",
+	"MarketplaceURL": "",
+	"SupportURL": "mailto:teufelsilvan@gmail.com",
+	"EngineVersion": "5.8.0",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "JointLedger",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64"
+			]
+		}
+	]
+}
