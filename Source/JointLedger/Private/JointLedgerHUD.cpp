@@ -10,6 +10,7 @@
 #include "ImageCore.h"
 #include "ImageUtils.h"
 #include "Kismet/KismetRenderingLibrary.h"
+#include "Misc/App.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 
@@ -171,6 +172,17 @@ FString AJointLedgerHUD::SavePanelImage(int32 Width, int32 Height, const FString
 	UWorld* World = GetWorld();
 	if (!World || Width < 16 || Height < 16)
 	{
+		return FString();
+	}
+	// OHNE RHI KEIN BILD — und das wird GESAGT, nicht stillschweigend uebergangen.
+	// `FImageUtils::GetRenderTargetImage` liest ein Render-Target, das in einem
+	// kopflosen Lauf keine Ressource hat: EXCEPTION_ACCESS_VIOLATION auf 0x0, Shell=3
+	// und kein Rueckgabewert im Protokoll. Die Messung und das Tor bleiben unberuehrt.
+	if (!FApp::CanEverRender())
+	{
+		UE_LOG(LogJointLedger, Warning,
+			TEXT("JointLedger: no RHI (headless) - skipping the image. ")
+			TEXT("The measurement and the gate are unaffected."));
 		return FString();
 	}
 

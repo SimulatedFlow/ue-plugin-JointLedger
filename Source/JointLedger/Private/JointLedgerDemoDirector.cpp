@@ -15,6 +15,7 @@
 #include "Kismet/KismetRenderingLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "Misc/App.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
@@ -330,6 +331,17 @@ FString AJointLedgerDemoDirector::SaveSceneImage(int32 Width, int32 Height,
 	UWorld* Welt = GetWorld();
 	if (!Welt || !SceneShot || Width < 16 || Height < 16)
 	{
+		return FString();
+	}
+	// OHNE RHI KEIN BILD — und das wird GESAGT, nicht stillschweigend uebergangen.
+	// `FImageUtils::GetRenderTargetImage` liest ein Render-Target, das in einem
+	// kopflosen Lauf keine Ressource hat: EXCEPTION_ACCESS_VIOLATION auf 0x0, Shell=3
+	// und kein Rueckgabewert im Protokoll. Die Messung und das Tor bleiben unberuehrt.
+	if (!FApp::CanEverRender())
+	{
+		UE_LOG(LogJointLedger, Warning,
+			TEXT("JointLedger: no RHI (headless) - skipping the image. ")
+			TEXT("The measurement and the gate are unaffected."));
 		return FString();
 	}
 
